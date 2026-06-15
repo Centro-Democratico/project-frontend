@@ -1,0 +1,6 @@
+{
+  "name": "Know your marks",
+  "description": "Interactive PC hardware benchmark suite, component planner, diagnostic logger, and database compiler.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
