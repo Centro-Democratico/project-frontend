@@ -1,7 +1,7 @@
 export type ActiveTab = 'overview' | 'my-hardware' | 'library' | 'admin';
 
 export interface HardwareComponent {
-  id: string; // e.g. '#GPU-4090'
+  id: string; 
   name: string;
   category: 'GPU' | 'CPU' | 'RAM' | 'SSD' | 'Motherboard';
   series: string;
