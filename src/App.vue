@@ -3,7 +3,6 @@ import { ref, computed, watch, onMounted, onUnmounted } from 'vue';
 import { INITIAL_COMPONENTS, INITIAL_LOGS, INITIAL_STATS } from './data';
 import { HardwareComponent, LogEntry, ActiveTab, UserStats } from './types';
 
-// Importing Vue subcomponents
 import LoginScreen from './components/LoginScreen.vue';
 import Sidebar from './components/Sidebar.vue';
 import Header from './components/Header.vue';
@@ -12,23 +11,19 @@ import MyHardwarePage from './components/MyHardwarePage.vue';
 import HardwareLibraryPage from './components/HardwareLibraryPage.vue';
 import AdminConsolePage from './components/AdminConsolePage.vue';
 
-// --- SYSTEM SEMANTIC CONSTANTS (Erasing Magic Numbers) ---
 const MIN_BENCHMARK_MS = 200;
 const PROGRESS_STEP_PCT = 5;
 
-// Milestone values
 const THRESHOLD_VAL_15 = 15;
 const THRESHOLD_VAL_40 = 40;
 const THRESHOLD_VAL_65 = 65;
 const THRESHOLD_VAL_85 = 85;
 const THRESHOLD_MAX_100 = 100;
 
-// High Load State Temps & Performance
 const PEAK_CPU_TEMP_C = 79;
 const PEAK_GPU_TEMP_C = 82;
 const PEAK_REALTIME_FPS = 189.4;
 
-// Optimal Cooldown Targets
 const OPTIMIZED_RANK_BOOST = 2;
 const MIN_RANK_FLOOR = 101;
 const OPTIMIZED_EFFICIENCY_PCT = 76;
@@ -37,7 +32,6 @@ const OPTIMIZED_GPU_TEMP_C = 64;
 const OPTIMIZED_REALTIME_FPS = 152.8;
 const OPTIMIZED_HEALTH_PCT = 99.1;
 
-// --- STATE MANAGEMENT ---
 const isAuthenticated = ref<boolean>(false);
 const activeTab = ref<ActiveTab>('overview');
 const components = ref<HardwareComponent[]>(INITIAL_COMPONENTS);
@@ -45,12 +39,10 @@ const logs = ref<LogEntry[]>(INITIAL_LOGS);
 const stats = ref<UserStats>(INITIAL_STATS);
 const searchQuery = ref('');
 
-// Benchmark engine states
 const isBenchmarking = ref(false);
 const benchmarkProgress = ref(0);
 let benchmarkInterval: ReturnType<typeof setInterval> | null = null;
 
-// --- DYNAMIC BACKEND MAPPER UTILITIES ---
 const mapBackendToFrontend = (backendComp: any): HardwareComponent => {
   const modelName = backendComp.model || 'Unnamed Spec';
   const brandName = backendComp.brand || 'Reference';
@@ -76,7 +68,6 @@ const mapBackendToFrontend = (backendComp: any): HardwareComponent => {
   };
 };
 
-// Fetch components from database backend
 const loadComponentsFromBackend = async () => {
   try {
     handleAddLog('Directing pipeline sync to backend service: GET /api/components...', 'info');
@@ -94,12 +85,6 @@ const loadComponentsFromBackend = async () => {
   }
 };
 
-/**
- * Appends a new timestamped technical diagnostic entry to the global logger.
- * @param {string} message - Human readable technical statement.
- * @param {'success' | 'info' | 'warn' | 'error'} type - Message categorization type.
- * @returns {void}
- */
 const handleAddLog = (message: string, type: 'success' | 'info' | 'warn' | 'error'): void => {
   const newLog: LogEntry = {
     id: `log-${Date.now()}-${Math.random()}`,
@@ -110,11 +95,6 @@ const handleAddLog = (message: string, type: 'success' | 'info' | 'warn' | 'erro
   logs.value = [newLog, ...logs.value];
 };
 
-/**
- * Dispatches diagnostic reports and updates physical state depending on progress thresholds.
- * @param {number} currentProgress - Computed percentage of simulation.
- * @returns {void}
- */
 const evaluateTelemetryThreshold = (currentProgress: number): void => {
   if (currentProgress === THRESHOLD_VAL_15) {
     handleAddLog('Threading target registers. Sweeping clock thresholds.', 'info');
@@ -133,10 +113,6 @@ const evaluateTelemetryThreshold = (currentProgress: number): void => {
   }
 };
 
-/**
- * Performs cleanup of active polling loops and locks updated score profiles.
- * @returns {void}
- */
 const concludeBenchmarkExecution = (): void => {
   if (benchmarkInterval) {
     clearInterval(benchmarkInterval);
@@ -155,7 +131,6 @@ const concludeBenchmarkExecution = (): void => {
     systemHealth: OPTIMIZED_HEALTH_PCT
   };
 
-  // Submit telemetry to backend (RF_9 - Telemetría anónima)
   const scoreComputed = Math.round(stats.value.realTimeFps * 220);
   const telemetryBody = {
     started_at: new Date(Date.now() - 30000).toISOString(),
@@ -194,10 +169,6 @@ const concludeBenchmarkExecution = (): void => {
   });
 };
 
-/**
- * Initiates the asynchronous synthetic performance benchmarking routines.
- * @returns {void}
- */
 const handleRunBenchmark = (): void => {
   if (isBenchmarking.value) return;
   isBenchmarking.value = true;
@@ -215,13 +186,8 @@ const handleRunBenchmark = (): void => {
   }, MIN_BENCHMARK_MS);
 };
 
-/**
- * Keydown handler callback supporting RF_2 (Keyboard shortcuts for navigation and action triggers).
- * @param {KeyboardEvent} event - System domestic keyboard event args.
- * @returns {void}
- */
 const handleGlobalKeyShortcut = (event: KeyboardEvent): void => {
-  // Navigation shortcuts: Alt + Shift + O (Overview), Alt + Shift + A (Admin console), Alt + Shift + L (Library)
+  
   if (event.altKey && event.shiftKey) {
     const key = event.key.toLowerCase();
     if (key === 'o') {
@@ -240,10 +206,9 @@ const handleGlobalKeyShortcut = (event: KeyboardEvent): void => {
   }
 };
 
-// Hook keys and release on unmount
 onMounted(async () => {
   window.addEventListener('keydown', handleGlobalKeyShortcut);
-  // Perform sync with python/django backend at setup
+  
   await loadComponentsFromBackend();
 });
 
@@ -254,11 +219,6 @@ onUnmounted(() => {
   }
 });
 
-/**
- * Inserts a new hardware component model into the general listings.
- * @param {HardwareComponent} comp - Deserialized item data structure.
- * @returns {void}
- */
 const handleAddComponent = async (comp: HardwareComponent): Promise<void> => {
   const words = comp.name.split(' ');
   const brand = words[0] || 'Reference';
@@ -285,17 +245,12 @@ const handleAddComponent = async (comp: HardwareComponent): Promise<void> => {
     components.value = [mapped, ...components.value.filter(c => c.id !== comp.id)];
     handleAddLog(`Created & persistent mapped into Django database backend successfully: ${mapped.id}`, 'success');
   } catch {
-    // Falls back to keeping the locally generated item
+   
     components.value = [comp, ...components.value];
     handleAddLog(`Database offline. Component logged in transient local state memory: ${comp.id}`, 'info');
   }
 };
 
-/**
- * Overwrites state details for an matching hardware component record.
- * @param {HardwareComponent} updatedComp - Changed target item schema.
- * @returns {void}
- */
 const handleEditComponent = async (updatedComp: HardwareComponent): Promise<void> => {
   const words = updatedComp.name.split(' ');
   const brand = words[0] || 'Reference';
@@ -328,11 +283,6 @@ const handleEditComponent = async (updatedComp: HardwareComponent): Promise<void
   }
 };
 
-/**
- * Truncates an item out of cache listings based on exact key.
- * @param {string} id - Selected element serial tag.
- * @returns {void}
- */
 const handleDeleteComponent = async (id: string): Promise<void> => {
   try {
     const cleanId = id;
@@ -373,20 +323,18 @@ const searchedComponents = computed(() => {
 
 <template>
   <div>
-    <!-- Render Login flow if not validated yet -->
+   
     <LoginScreen 
       v-if="!isAuthenticated" 
       @login-success="isAuthenticated = true" 
     />
 
-    <!-- Main authenticated application shell -->
     <div 
       v-else 
       id="dashboard-layout" 
       class="min-h-screen bg-tech-bg text-dark-ink flex select-none overflow-x-hidden text-left"
     >
-      
-      <!-- Side navigation rail -->
+    
       <Sidebar 
         :activeTab="activeTab" 
         @update:activeTab="activeTab = $event"
@@ -395,16 +343,12 @@ const searchedComponents = computed(() => {
         :isBenchmarking="isBenchmarking"
       />
 
-      <!-- Main layout column -->
       <div class="flex-1 md:ml-64 flex flex-col min-h-screen">
-        
-        <!-- Top search & profile header -->
+       
         <Header @search="handleSearchUpdate" />
 
-        <!-- Dynamic page placement region -->
         <main class="flex-1 p-6 max-w-[1280px] mx-auto w-full pb-16">
-          
-          <!-- Stress Test notification strip -->
+        
           <div 
             v-if="isBenchmarking" 
             class="mb-6 bg-brand-green/10 border border-brand-green/30 p-4 rounded-md animate-pulse flex items-center justify-between"
@@ -420,7 +364,6 @@ const searchedComponents = computed(() => {
             </div>
           </div>
 
-          <!-- Component page switches -->
           <OverviewPage 
             v-if="activeTab === 'overview'"
             :stats="stats" 
