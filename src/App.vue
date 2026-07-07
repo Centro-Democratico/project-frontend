@@ -234,7 +234,7 @@ const handleAddComponent = async (comp: HardwareComponent): Promise<void> => {
   };
 
   try {
-    const res = await fetch('/api/components', {
+    const res = await fetch('/api/components/', {
       method: 'POST',
       headers: { 'X-User-Admin': 'true', 'Content-Type': 'application/json' },
       body: JSON.stringify(payload)
