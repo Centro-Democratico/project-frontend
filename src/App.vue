@@ -152,7 +152,7 @@ const concludeBenchmarkExecution = (): void => {
 
   handleAddLog('Transmitting real-time stress test parameters to global telemetry proxy...', 'info');
 
-  fetch('/api/telemetry', {
+  fetch('/api/telemetry/', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(telemetryBody)
